@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="{% static 'main.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'main.css' %}"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}WayWithYou – Event ride-sharing{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <div class="wty-page">
+    <header class="wty-hero">
+      <div class="wty-hero-inner">
+        <a href="{% url 'home' %}" class="wty-logo-link" aria-label="WayWithYou home">
+          <img src="{% static 'logo.png' %}" alt="WayWithYou" class="wty-logo">
+        </a>
+      </div>
+      <nav class="wty-nav">
+        <a href="{% url 'home' %}" class="wty-nav-link">Home</a>
+        <a href="{% url 'rides:index' %}" class="wty-nav-link">Search rides</a>
+        <a href="{% url 'rides:add' %}" class="wty-nav-link">Add ride</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'rides:hearted' %}" class="wty-nav-link">Hearted</a>
+        <a href="{% url 'logout' %}" class="wty-nav-link">Log out</a>
+        {% else %}
+        <a href="{% url 'login' %}" class="wty-nav-link">Log in</a>
+        <a href="{% url 'register' %}" class="wty-nav-link">Create profile</a>
+        {% endif %}
+      </nav>
+    </header>
+
+    <section class="wty-intro">
+      <div class="wty-intro-icons">
+        <img src="{% static 'images/icon-search.svg' %}" alt="" class="wty-intro-icon" width="28" height="28">
+        <img src="{% static 'images/icon-ride.svg' %}" alt="" class="wty-intro-icon" width="28" height="28">
+      </div>
+      <p class="wty-intro-text">Find ride-sharing partners for your event. Search by origination, destination, and state.</p>
+    </section>
+
+    <main class="wty-main">
+      {% block content %}
+      {% endblock %}
+    </main>
+
+    <footer class="wty-footer">
+      <div class="wty-footer-inner">
+        <img src="{% static 'logo.png' %}" alt="WayWithYou" class="wty-footer-logo">
+        <div class="wty-footer-text">
+          <p class="wty-footer-brand">WayWithYou</p>
+          <p class="wty-footer-tagline">Same destination? Share a ride!</p>
+          <p class="wty-footer-links">
+            <a href="{% url 'home' %}">Home</a>
+            <span class="wty-footer-sep">·</span>
+            <a href="{% url 'rides:index' %}">Search rides</a>
+            <span class="wty-footer-sep">·</span>
+            <a href="{% url 'rides:add' %}">Add ride</a>
+          </p>
+        </div>
+      </div>
+    </footer>
+  </div>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

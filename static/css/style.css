@@ -1,0 +1,591 @@
+/*
+ * WayWithYou – clean, presentable palette (navy/white/blue from logo)
+ */
+:root {
+  --wt-primary: #1e3a5f;
+  --wt-primary-hover: #0f2744;
+  --wt-accent: #3b82f6;
+  --wt-accent-soft: #dbeafe;
+  --wt-navy: #1e3a5f;
+  --wt-surface: #ffffff;
+  --wt-surface-alt: #f1f5f9;
+  --wt-bg-subtle: #e8eef4;
+  --wt-text: #1e293b;
+  --wt-text-muted: #64748b;
+  --wt-border: #e2e8f0;
+  --wt-radius: 10px;
+  --wt-radius-lg: 14px;
+  --wt-shadow: 0 1px 3px rgba(30, 58, 95, 0.08);
+  --wt-shadow-lg: 0 4px 20px rgba(30, 58, 95, 0.1);
+  --wt-font: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --wt-font-heading: "Outfit", var(--wt-font);
+  --wt-space-xs: 0.5rem;
+  --wt-space-sm: 1rem;
+  --wt-space-md: 1.5rem;
+  --wt-space-lg: 2rem;
+  --wt-space-xl: 2.5rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--wt-font);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--wt-text);
+  background: linear-gradient(160deg, var(--wt-surface-alt) 0%, var(--wt-bg-subtle) 50%, var(--wt-surface-alt) 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+.wty-page {
+  max-width: 960px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--wt-space-md);
+}
+
+/* Header: logo bar full width + navigation */
+.wty-hero {
+  position: relative;
+  z-index: 10;
+  width: 100vw;
+  max-width: 100vw;
+  left: 50%;
+  right: auto;
+  margin-left: -50vw;
+  background: #ffffff;
+  padding: 0;
+  text-align: center;
+  border-bottom: 1px solid var(--wt-border);
+  box-shadow: var(--wt-shadow);
+}
+
+.wty-hero-inner {
+  width: 100%;
+  padding: var(--wt-space-lg) var(--wt-space-md);
+  overflow: hidden;
+  background: #ffffff;
+  min-height: 220px;
+  max-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wty-logo-link {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+
+.wty-hero .wty-logo {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  min-height: 200px;
+  max-height: 260px;
+  object-fit: contain;
+  object-position: center;
+  vertical-align: middle;
+}
+
+.wty-nav {
+  display: flex;
+  justify-content: center;
+  gap: var(--wt-space-lg);
+  padding: var(--wt-space-sm) var(--wt-space-md);
+  background: var(--wt-surface);
+  border-top: 1px solid var(--wt-border);
+}
+
+.wty-nav-link {
+  font-family: var(--wt-font-heading);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--wt-primary);
+  text-decoration: none;
+  padding: var(--wt-space-xs) var(--wt-space-sm);
+  border-radius: 6px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.wty-nav-link:hover {
+  background: var(--wt-accent-soft);
+  color: var(--wt-primary-hover);
+}
+
+/* Site description: its own section below the logo */
+.wty-intro {
+  background: linear-gradient(180deg, var(--wt-surface) 0%, var(--wt-surface-alt) 100%);
+  padding: var(--wt-space-lg) var(--wt-space-md);
+  text-align: center;
+}
+
+.wty-intro-icons {
+  display: flex;
+  justify-content: center;
+  gap: var(--wt-space-md);
+  margin-bottom: var(--wt-space-sm);
+}
+
+.wty-intro-icon {
+  opacity: 0.85;
+  vertical-align: middle;
+}
+
+.wty-intro-text {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--wt-text-muted);
+  max-width: 32em;
+  margin-left: auto;
+  margin-right: auto;
+  font-weight: 500;
+}
+
+/* Main content */
+.wty-main {
+  flex: 1;
+  padding: var(--wt-space-xl) var(--wt-space-md);
+}
+
+.wty-card {
+  background: var(--wt-surface);
+  border-radius: var(--wt-radius-lg);
+  box-shadow: var(--wt-shadow-lg);
+  padding: var(--wt-space-xl);
+  margin-bottom: var(--wt-space-lg);
+}
+
+.wty-card-visual {
+  text-align: center;
+  margin-bottom: var(--wt-space-sm);
+}
+
+.wty-card-img {
+  max-width: 100px;
+  height: auto;
+  opacity: 0.9;
+}
+
+.wty-card h2 {
+  margin: 0 0 var(--wt-space-sm);
+  font-family: var(--wt-font-heading);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--wt-text);
+  letter-spacing: -0.02em;
+}
+
+.wty-card .wty-card-desc {
+  margin: 0 0 var(--wt-space-lg);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--wt-text-muted);
+}
+
+/* Form: STOA – clear labels, single primary action */
+.wty-form p {
+  margin-top: 1rem;
+  margin-bottom: 0;
+}
+
+.wty-form p:first-child {
+  margin-top: 0;
+}
+
+.wty-form label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--wt-text);
+}
+
+.wty-form input[type="text"],
+.wty-form input[type="date"],
+.wty-form input[type="email"],
+.wty-form input[type="number"],
+.wty-form input[type="time"],
+.wty-form select,
+.wty-form textarea {
+  width: 100%;
+  max-width: 320px;
+  padding: 0.6rem 0.85rem;
+  font-size: 1rem;
+  border: 1px solid var(--wt-border);
+  border-radius: 6px;
+  background: var(--wt-surface);
+  color: var(--wt-text);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  font-family: inherit;
+}
+
+.wty-form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.wty-form select {
+  cursor: pointer;
+  appearance: auto;
+}
+
+.wty-form input[type="text"]:focus,
+.wty-form input[type="date"]:focus,
+.wty-form input[type="email"]:focus,
+.wty-form input[type="number"]:focus,
+.wty-form input[type="time"]:focus,
+.wty-form select:focus,
+.wty-form textarea:focus {
+  outline: none;
+  border-color: var(--wt-primary);
+  box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.15);
+}
+
+.wty-form .wty-btn {
+  margin-top: 1.25rem;
+  padding: 0.65rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--wt-primary);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.wty-form .wty-btn:hover {
+  background: var(--wt-primary-hover);
+}
+
+/* Add-ride form: primary + secondary actions */
+.wty-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wt-space-sm);
+  margin-top: 1.25rem;
+}
+
+.wty-btn-secondary {
+  background: var(--wt-surface-alt);
+  color: var(--wt-primary);
+  border: 1px solid var(--wt-border);
+  padding: 0.65rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.wty-btn-secondary:hover {
+  background: var(--wt-bg-subtle);
+  border-color: var(--wt-primary);
+}
+
+/* Card CTA: link to add ride (on search page) */
+.wty-card-cta {
+  margin: 0 0 var(--wt-space-lg);
+  padding: var(--wt-space-md);
+  background: var(--wt-surface);
+  border-radius: var(--wt-radius-lg);
+  box-shadow: var(--wt-shadow-lg);
+  text-align: center;
+}
+
+.wty-card-back {
+  margin: var(--wt-space-lg) 0 0;
+  font-size: 0.95rem;
+}
+
+.wty-card-back a {
+  color: var(--wt-accent);
+  text-decoration: none;
+}
+
+.wty-card-back a:hover {
+  text-decoration: underline;
+}
+
+/* Splash: outline button (Add a ride) */
+.wty-btn-outline {
+  background: transparent;
+  color: var(--wt-primary);
+  border: 2px solid var(--wt-primary);
+  margin-left: var(--wt-space-sm);
+}
+
+.wty-btn-outline:hover {
+  background: var(--wt-accent-soft);
+  color: var(--wt-primary-hover);
+  border-color: var(--wt-primary-hover);
+}
+
+/* Splash (welcome) page */
+.wty-splash {
+  text-align: center;
+  padding: var(--wt-space-xl) var(--wt-space-lg);
+}
+
+.wty-splash-visual {
+  margin-bottom: var(--wt-space-lg);
+}
+
+.wty-splash-img {
+  max-width: 160px;
+  height: auto;
+  opacity: 0.9;
+}
+
+.wty-splash-features {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--wt-space-md);
+  margin-bottom: var(--wt-space-lg);
+  font-size: 0.9rem;
+  color: var(--wt-text-muted);
+}
+
+.wty-splash-feature {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.wty-splash-feature img {
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.wty-splash h2 {
+  margin: 0 0 var(--wt-space-md);
+  font-family: var(--wt-font-heading);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--wt-text);
+  letter-spacing: -0.02em;
+}
+
+.wty-splash-text {
+  margin: 0 0 var(--wt-space-xl);
+  font-size: 1.1rem;
+  line-height: 1.65;
+  color: var(--wt-text-muted);
+  max-width: 28em;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.wty-splash-cta {
+  margin: 0;
+}
+
+a.wty-btn,
+a.wty-btn-splash {
+  display: inline-block;
+  text-decoration: none;
+  margin-top: 0;
+  padding: 0.65rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--wt-primary);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+a.wty-btn:hover,
+a.wty-btn-splash:hover {
+  background: var(--wt-primary-hover);
+  color: #fff;
+}
+
+/* Results */
+.wty-results h3 {
+  margin: 0 0 var(--wt-space-md);
+  font-family: var(--wt-font-heading);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--wt-text);
+}
+
+.wty-table-wrap {
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.wty-results table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.wty-results th,
+.wty-results td {
+  text-align: left;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--wt-border);
+}
+
+.wty-results th {
+  background: var(--wt-surface-alt);
+  font-weight: 600;
+  color: var(--wt-text);
+}
+
+.wty-results tr:hover td {
+  background: rgba(248, 250, 252, 0.8);
+}
+
+/* Join ride button in results table – compact so it fits the cell */
+.wty-join-ride {
+  margin: 0;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* Heart icon: outline by default, filled when hearted */
+.wty-heart {
+  background: none;
+  border: none;
+  padding: 0.35rem;
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--wt-text-muted);
+  transition: color 0.15s ease;
+}
+
+.wty-heart:hover {
+  color: #dc2626;
+}
+
+.wty-heart .wty-heart-icon::before {
+  content: "\2661";
+}
+
+.wty-heart.wty-hearted .wty-heart-icon::before {
+  content: "\2665";
+  color: #dc2626;
+}
+
+.wty-auth-links {
+  margin: 1rem 0 0;
+  font-size: 0.95rem;
+  color: var(--wt-text-muted);
+}
+
+.wty-auth-links a {
+  color: var(--wt-primary);
+  text-decoration: none;
+}
+
+.wty-auth-links a:hover {
+  text-decoration: underline;
+}
+
+.wty-splash-auth {
+  margin: 1.25rem 0 0;
+  font-size: 0.9rem;
+  color: var(--wt-text-muted);
+}
+
+.wty-splash-auth a {
+  color: var(--wt-primary);
+  text-decoration: none;
+}
+
+.wty-splash-auth a:hover {
+  text-decoration: underline;
+}
+
+.wty-no-results {
+  color: var(--wt-text-muted);
+  margin: 1rem 0;
+}
+
+.wty-results .wty-decoration-img {
+  max-width: 180px;
+  margin-top: 1.25rem;
+  opacity: 0.9;
+}
+
+/* Footer */
+.wty-footer {
+  margin-top: auto;
+  padding: var(--wt-space-xl) var(--wt-space-md);
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--wt-text-muted);
+  background: var(--wt-primary);
+  color: rgba(255, 255, 255, 0.9);
+  border-top: none;
+}
+
+.wty-footer-inner {
+  max-width: 400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wt-space-md);
+  flex-wrap: wrap;
+}
+
+.wty-footer .wty-footer-logo {
+  max-width: 64px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.wty-footer-text {
+  text-align: left;
+}
+
+.wty-footer-brand {
+  margin: 0 0 0.15em;
+  font-family: var(--wt-font-heading);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.wty-footer-tagline {
+  margin: 0 0 0.35em;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.wty-footer-links {
+  margin: 0.5em 0 0;
+}
+
+.wty-footer a {
+  color: rgba(255, 255, 255, 0.95);
+  text-decoration: none;
+}
+
+.wty-footer a:hover {
+  text-decoration: underline;
+}
+
+.wty-footer-sep {
+  margin: 0 0.4em;
+  opacity: 0.7;
+}
+

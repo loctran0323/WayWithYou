@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="wty-card">
+  <h2>Log in</h2>
+  <p class="wty-card-desc">Sign in to your account to heart rides and see your saved list.</p>
+  <form method="post" action="{% url 'login' %}" class="wty-form">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Log in" class="wty-btn">
+    <input type="hidden" name="next" value="{{ next }}">
+  </form>
+  <p class="wty-auth-links">
+    Don't have an account? <a href="{% url 'register' %}">Create a profile</a>
+  </p>
+</section>
+{% endblock %}

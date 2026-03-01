@@ -1,0 +1,54 @@
+/* Map section – Uber/Lyft-style: current location, destination pin, ETA */
+.wty-map-card {
+  margin-top: 1rem;
+}
+
+.wty-map-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.wty-map-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.6rem 0.85rem;
+  font-size: 1rem;
+  border: 1px solid var(--wt-border);
+  border-radius: 6px;
+  background: var(--wt-surface);
+}
+
+.wty-map-btn {
+  margin-top: 0;
+}
+
+.wty-map-eta {
+  padding: 0.75rem 1rem;
+  background: var(--wt-accent-soft);
+  border-radius: 6px;
+  font-weight: 600;
+  color: var(--wt-primary);
+  margin-bottom: 1rem;
+}
+
+.wty-map-eta.hidden {
+  display: none;
+}
+
+.wty-map-container {
+  width: 100%;
+  height: 360px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--wt-border);
+  background: var(--wt-surface-alt);
+}
+
+.wty-map-hint {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  color: var(--wt-text-muted);
+}

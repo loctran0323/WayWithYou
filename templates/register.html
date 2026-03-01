@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="wty-card">
+  <h2>Create a profile</h2>
+  <p class="wty-card-desc">Sign up to save rides you're interested in and see them on your Hearted page.</p>
+  <form method="post" action="{% url 'register' %}" class="wty-form">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Sign up" class="wty-btn">
+  </form>
+  <p class="wty-auth-links">
+    Already have an account? <a href="{% url 'login' %}">Log in</a>
+  </p>
+</section>
+{% endblock %}

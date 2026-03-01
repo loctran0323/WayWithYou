@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="{% static 'css/map.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="wty-card">
+  <div class="wty-card-visual">
+    <img src="{% static 'images/carpool.svg' %}" alt="" class="wty-card-img" width="100" height="67">
+  </div>
+  <h2>Search registrants</h2>
+  <p class="wty-card-desc">Filter by origination, destination, state, date (YYYY-MM-DD), and whether they are taking passengers.</p>
+
+  <form action="{% url 'rides:index' %}" method="get" class="wty-form" onsubmit="return checkForm(this);">
+    {{ form.as_p }}
+    <input type="submit" value="Search" class="wty-btn">
+  </form>
+</section>
+
+{% if inputExists %}
+<section class="wty-card wty-results">
+  {% if people %}
+  <h3>Registrants matching your search{% if search_origin_city or search_destination_city or search_state or search_date or search_taking_passengers %}:{% if search_origin_city %} origin "{{ search_origin_city }}"{% endif %}{% if search_origin_city and search_destination_city %} and{% endif %}{% if search_destination_city %} destination "{{ search_destination_city }}"{% endif %}{% if search_state %}{% if search_origin_city or search_destination_city %} and{% endif %} state "{{ search_state }}"{% endif %}{% if search_date %}{% if search_origin_city or search_destination_city or search_state %} and{% endif %} date {{ search_date }}{% endif %}{% if search_taking_passengers %}{% if search_origin_city or search_destination_city or search_state or search_date %} and{% endif %} taking passengers: {% if search_taking_passengers == '1' %}Yes{% else %}No{% endif %}{% endif %}{% endif %}</h3>
+  <div class="wty-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Origination</th>
+          <th>Destination</th>
+          <th>State</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Vehicle</th>
+          <th>Tier</th>
+          <th>Price/seat</th>
+          <th>Taking Passengers</th>
+          <th>Seats Available</th>
+          {% if user.is_authenticated %}<th aria-label="Save ride">♥</th>{% endif %}
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for person in people %}
+        <tr>
+          <td>{{ person.first_name }}{% if person.last_name %} {{ person.last_name }}{% endif %}</td>
+          <td>{{ person.origination }}{% if person.origination_state %}, {{ person.origination_state }}{% endif %}</td>
+          <td>{{ person.destination_city }}</td>
+          <td>{{ person.destination_state }}</td>
+          <td>{{ person.date }}</td>
+          <td>{{ person.time }}</td>
+          <td>{{ person.get_vehicle_type_display|default:"—" }}</td>
+          <td>{{ person.get_service_tier_display }}</td>
+          <td>{% if person.max_price_per_seat is not None %}${{ person.max_price_per_seat }}{% else %}—{% endif %}</td>
+          <td>{{ person.taking_passengers|yesno:"Yes,No" }}</td>
+          <td>{{ person.seats_available }}</td>
+          {% if user.is_authenticated %}
+          <td>
+            <button type="button" class="wty-heart {% if person.id in hearted_ids %}wty-hearted{% endif %}" data-person-id="{{ person.id }}" aria-label="Heart this ride" title="Save to Hearted">
+              <span class="wty-heart-icon" aria-hidden="true"></span>
+            </button>
+          </td>
+          {% endif %}
+          <td>
+            {% if person.taking_passengers %}
+            <button type="button" class="wty-btn wty-join-ride" data-origin="{{ person.origination }}{% if person.origination_state %}, {{ person.origination_state }}{% endif %}" data-destination="{{ person.destination_city }}, {{ person.destination_state }}" onclick="var o=this.getAttribute('data-origin'); var d=this.getAttribute('data-destination'); if(o && d && window.setMapRoute) window.setMapRoute(o,d); else if(d && window.setMapDestination) window.setMapDestination(d); return false;">Join ride</button>
+            {% else %}
+            —
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <h3>No registrants found</h3>
+  <p class="wty-no-results">No registrants match your search. Try a different origin city, destination city, or state.</p>
+  <img src="{% static 'images/carpool.svg' %}" alt="WayWithYou ride share" class="wty-decoration-img">
+  {% endif %}
+</section>
+{% endif %}
+
+<section class="wty-card wty-map-card">
+  <h2>Map &amp; ETA</h2>
+  <p class="wty-card-desc">See your location and set a destination to get an estimated arrival time.</p>
+  <div class="wty-map-controls">
+    <input type="text" id="map-destination" class="wty-map-input" placeholder="e.g. West Hollywood, CA or full address" autocomplete="off">
+    <button type="button" id="map-set-destination" class="wty-btn wty-map-btn">Set destination</button>
+  </div>
+  <div id="map-eta" class="wty-map-eta hidden"></div>
+  <div id="wty-map" class="wty-map-container"></div>
+  <p class="wty-map-hint">Allow location access to see your position. Set a destination to see the route and ETA.</p>
+</section>
+
+<p class="wty-card-cta">
+  <a href="{% url 'rides:add' %}" class="wty-btn">Add a ride</a> to the public list.
+</p>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="{% static 'js/map.js' %}?v=5"></script>
+{% if user.is_authenticated %}<script src="{% static 'js/hearts.js' %}"></script>{% endif %}
+{% endblock %}

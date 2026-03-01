@@ -1,0 +1,31 @@
+First name,Origin City,Destination City,Destination State,Date (YY-MM-DD),Time (ex: 14:25),Taking Passengers (true/false),seats_available
+Sofia (Rich Grainge),"145 Copley Pl, Beverly Hills",West Hollywood,CA,2025-11-08,14:05,true,1
+Serena (Williams),Beverly Hills,West Hollywood,CA,2025-11-08,15:47,true,2
+Olivia (Munn),"9200 W. Sunset Boulevard, West Hollywood",West Hollywood,CA,2025-11-08,16:49,true,1
+Elsa (Hosk),"528 Hermosa Street, South Pasadena",West Hollywood,CA,2025-11-08,16:20,false,0
+Jessica (Alba),"9460 Wilshire Bouldevard, Beverley Hills",West Hollywood,CA,2025-11-08,16:35,true,3
+Sara (Sampaio),Beverly Hills,West Hollywood,CA,2025-11-08,15:31,false,0
+Rachel (Zoe),"610 North Cannon Drive, Beverly Hills",West Hollywood,CA,2025-11-08,15:38,true,2
+Kerry (Washington),"9777 Wilshire Boulevard, Beverly Hills",West Hollywood,CA,2025-11-08,15:21,true,2
+Marianna (Hewitt),14391 W Virginia Dr Lakewood CO,West Hollywood,CA,2025-11-06,21:23,false,0
+Anna (Kendrick),"2421 Creston Way, Hollywood Dell, Los Angeles",West Hollywood,CA,2025-11-08,14:24,false,0
+Demi (Lovato),"10635 Santa Monica Bouldevard, Studio City, Los Angeles",West Hollywood,CA,2025-11-08,16:34,false,0
+Julianne (Hough),"7422 Palo Vista Drive, Hollywood Hills, Los Angeles",West Hollywood,CA,2025-11-08,17:21,true,2
+Paris (Hilton),"71 Beverly Park, Beverly Hills",West Hollywood,CA,2025-11-08,16:48,false,0
+Nicole (Richie),"1415 Paloma Avenue, Burlingame",West Hollywood,CA,2025-11-08,15:23,true,1
+Ciara,"Rancho Santa Fe, ",West Hollywood,CA,2025-11-07,10:17,false,0
+Shay (Mitchell),Hidden Hills,West Hollywood,CA,2025-11-08,10:45,false,0
+Leslie (Mann),"945 Green St San Francisco, ",West Hollywood,CA,2025-11-08,12:11,false,0
+Sara (Foster),1883 Com Stock Avenue (beverley Hills),West Hollywood,CA,2025-11-08,15:23,false,0
+Erin (Foster),87 Bond Ln Brentwood CA,West Hollywood,CA,2025-11-08,16:10,true,1
+Julie (Bowen),20225 Case St Corona,West Hollywood,CA,2025-11-08,12:19,false,0
+Danny (Ramirez),"155 Spring Street, New York, NY",West Hollywood,CA,2025-11-05,9:16,false,0
+Kelly (Sawyer Patricof),"Los Angeles, California, United States.",West Hollywood,CA,2025-11-08,17:52,true,3
+Norah (Weinstein),235 S Chadbourne Ave Los Angeles CA 90049,West Hollywood,CA,2025-11-08,14:31,true,4
+Ayesha (Curry),3700 Fair Oaks Ave Menlo Park CA 94025,West Hollywood,CA,2025-11-08,18:56,false,0
+Camila (Alves McConnaughey),"Austin, TX",West Hollywood,CA,2025-11-06,13:23,true,2
+Chriselle (Lim),"5634 Sunmist Dr, Rancho Palos Verdes, CA 90275",West Hollywood,CA,2025-11-08,15:12,false,0
+Jake (Shane),"Los Angeles, California",West Hollywood,CA,2025-11-08,17:01,false,0
+Briana (Cuoco),5550 W Avenue M4 Lancaster CA 93536,West Hollywood,CA,2025-11-08,16:32,true,1
+Evan (Spiegel),"3000 31st Street Santa Monica, CA ",West Hollywood,CA,2025-11-08,18:12,false,0
+Molly (Sims),"9601 Wilshire Blvd Beverly Hills, CA",West Hollywood,CA,2025-11-08,16:39,false,0

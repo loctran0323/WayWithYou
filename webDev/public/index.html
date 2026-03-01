@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WayWithYou – Find ride-sharing partners</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="header-inner">
+        <img src="logo.png" alt="WayWithYou" class="logo" onerror="this.style.display='none'">
+      </div>
+    </header>
+
+    <section class="intro">
+      <p class="intro-text">Find ride-sharing partners for your event. Search by origination, destination, and state.</p>
+    </section>
+
+    <main class="main">
+      <section class="search-section">
+        <h2>Search registrants</h2>
+        <p>Enter a 2-letter state and/or origination and destination city. Search is case insensitive.</p>
+        <form id="search-form" class="search-form">
+          <label for="state">State (2-letter abbreviation)</label>
+          <input type="text" id="state" name="state" maxlength="2" placeholder="e.g. CA, NY" autocomplete="off">
+          <label for="origin_city">Origination city</label>
+          <input type="text" id="origin_city" name="origin_city" placeholder="e.g. Beverly Hills, New York" autocomplete="off">
+          <label for="destination_city">Destination city</label>
+          <input type="text" id="destination_city" name="destination_city" placeholder="e.g. West Hollywood, Washington" autocomplete="off">
+          <label for="date">Date (YYYY-MM-DD)</label>
+          <input type="date" id="date" name="date">
+          <label for="taking_passengers">Taking passengers</label>
+          <select id="taking_passengers" name="taking_passengers">
+            <option value="">All</option>
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+          </select>
+          <button type="submit">Search</button>
+        </form>
+      </section>
+
+      <section id="results-section" class="results-section hidden">
+        <h3 id="results-heading"></h3>
+        <div id="results-table-wrap"></div>
+        <p id="no-results" class="no-results hidden">No registrants found. Try a different state or city.</p>
+        <img src="carpool.svg" alt="Ride share" class="decoration-img" onerror="this.style.display='none'">
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p><img src="logo.png" alt="WayWithYou" class="footer-logo" onerror="this.style.display='none'"> WayWithYou – event ride-sharing</p>
+    </footer>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

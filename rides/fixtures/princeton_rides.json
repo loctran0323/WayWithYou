@@ -1,0 +1,170 @@
+[
+  {
+    "model": "rides.person",
+    "pk": 1,
+    "fields": {
+      "first_name": "Jordan",
+      "last_name": "Lee",
+      "email": "jordan.lee@example.com",
+      "origination": "Princeton",
+      "origination_state": "NJ",
+      "destination_city": "New Brunswick",
+      "destination_state": "NJ",
+      "date": "2026-03-15",
+      "time": "08:00",
+      "taking_passengers": true,
+      "seats_available": 2,
+      "vehicle_type": "sedan",
+      "service_tier": "regular",
+      "max_price_per_seat": "5.00",
+      "notes": "Carpool to Rutgers area. Flexible on time."
+    }
+  },
+  {
+    "model": "rides.person",
+    "pk": 2,
+    "fields": {
+      "first_name": "Sam",
+      "last_name": "Chen",
+      "email": "sam.chen@example.com",
+      "origination": "Lawrenceville",
+      "origination_state": "NJ",
+      "destination_city": "Princeton",
+      "destination_state": "NJ",
+      "date": "2026-03-16",
+      "time": "07:30",
+      "taking_passengers": true,
+      "seats_available": 3,
+      "vehicle_type": "suv",
+      "service_tier": "regular",
+      "max_price_per_seat": null,
+      "notes": "Free carpool to Princeton. Leave from Lawrenceville."
+    }
+  },
+  {
+    "model": "rides.person",
+    "pk": 3,
+    "fields": {
+      "first_name": "Alex",
+      "last_name": "Rivera",
+      "email": "alex.r@example.com",
+      "origination": "West Windsor",
+      "origination_state": "NJ",
+      "destination_city": "Trenton",
+      "destination_state": "NJ",
+      "date": "2026-03-14",
+      "time": "09:15",
+      "taking_passengers": true,
+      "seats_available": 1,
+      "vehicle_type": "sedan",
+      "service_tier": "premium",
+      "max_price_per_seat": "8.00",
+      "notes": "Premium ride to Trenton. Plan ahead, cheap rate."
+    }
+  },
+  {
+    "model": "rides.person",
+    "pk": 4,
+    "fields": {
+      "first_name": "Morgan",
+      "last_name": "Kim",
+      "email": "morgan.kim@example.com",
+      "origination": "Plainsboro",
+      "origination_state": "NJ",
+      "destination_city": "Princeton",
+      "destination_state": "NJ",
+      "date": "2026-03-17",
+      "time": "17:00",
+      "taking_passengers": true,
+      "seats_available": 2,
+      "vehicle_type": "hatchback",
+      "service_tier": "regular",
+      "max_price_per_seat": null,
+      "notes": "Evening ride to Princeton. Free carpool."
+    }
+  },
+  {
+    "model": "rides.person",
+    "pk": 5,
+    "fields": {
+      "first_name": "Casey",
+      "last_name": "Nguyen",
+      "email": "casey.n@example.com",
+      "origination": "Princeton",
+      "origination_state": "NJ",
+      "destination_city": "Newark",
+      "destination_state": "NJ",
+      "date": "2026-03-18",
+      "time": "06:45",
+      "taking_passengers": true,
+      "seats_available": 3,
+      "vehicle_type": "van",
+      "service_tier": "regular",
+      "max_price_per_seat": "10.00",
+      "notes": "Early ride to Newark. Cheap per seat, plan ahead."
+    }
+  },
+  {
+    "model": "rides.person",
+    "pk": 6,
+    "fields": {
+      "first_name": "Riley",
+      "last_name": "Foster",
+      "email": "riley.f@example.com",
+      "origination": "North Brunswick",
+      "origination_state": "NJ",
+      "destination_city": "Princeton",
+      "destination_state": "NJ",
+      "date": "2026-03-15",
+      "time": "08:30",
+      "taking_passengers": false,
+      "seats_available": 0,
+      "vehicle_type": "sedan",
+      "service_tier": "regular",
+      "max_price_per_seat": null,
+      "notes": "Commute only; no passengers."
+    }
+  },
+  {
+    "model": "rides.person",
+    "pk": 7,
+    "fields": {
+      "first_name": "Quinn",
+      "last_name": "Patel",
+      "email": "quinn.patel@example.com",
+      "origination": "East Brunswick",
+      "origination_state": "NJ",
+      "destination_city": "Princeton",
+      "destination_state": "NJ",
+      "date": "2026-03-16",
+      "time": "07:00",
+      "taking_passengers": true,
+      "seats_available": 2,
+      "vehicle_type": "suv",
+      "service_tier": "premium",
+      "max_price_per_seat": "7.50",
+      "notes": "Premium CartyCity. Comfort ride to Princeton."
+    }
+  },
+  {
+    "model": "rides.person",
+    "pk": 8,
+    "fields": {
+      "first_name": "Taylor",
+      "last_name": "Wright",
+      "email": "taylor.w@example.com",
+      "origination": "Princeton",
+      "origination_state": "NJ",
+      "destination_city": "Philadelphia",
+      "destination_state": "PA",
+      "date": "2026-03-20",
+      "time": "10:00",
+      "taking_passengers": true,
+      "seats_available": 2,
+      "vehicle_type": "sedan",
+      "service_tier": "regular",
+      "max_price_per_seat": "12.00",
+      "notes": "Princeton to Philly. Plan ahead, cheap split."
+    }
+  }
+]

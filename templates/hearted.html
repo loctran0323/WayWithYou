@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="wty-card wty-results" data-hearted-page>
+  <h2>Hearted rides</h2>
+  <p class="wty-card-desc">Rides you've saved. Click the heart again to remove from this list.</p>
+  {% if people %}
+  <div class="wty-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Origination</th>
+          <th>Destination</th>
+          <th>State</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Taking Passengers</th>
+          <th>Seats Available</th>
+          <th aria-label="Saved">♥</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for person in people %}
+        <tr>
+          <td>{{ person.first_name }}</td>
+          <td>{{ person.origination }}</td>
+          <td>{{ person.destination_city }}</td>
+          <td>{{ person.destination_state }}</td>
+          <td>{{ person.date }}</td>
+          <td>{{ person.time }}</td>
+          <td>{{ person.taking_passengers|yesno:"Yes,No" }}</td>
+          <td>{{ person.seats_available }}</td>
+          <td>
+            <button type="button" class="wty-heart wty-hearted" data-person-id="{{ person.id }}" aria-label="Unheart this ride" title="Remove from Hearted">
+              <span class="wty-heart-icon" aria-hidden="true"></span>
+            </button>
+          </td>
+          <td>
+            {% if person.taking_passengers %}
+            <a href="{% url 'rides:index' %}?origin_city={{ person.origination|urlencode }}&destination_city={{ person.destination_city|urlencode }}&state={{ person.destination_state }}" class="wty-btn wty-join-ride">View &amp; join</a>
+            {% else %}
+            —
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="wty-no-results">You haven't hearted any rides yet. Search for rides and click the heart to save them here.</p>
+  <a href="{% url 'rides:index' %}" class="wty-btn">Search rides</a>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if user.is_authenticated %}<script src="{% static 'js/hearts.js' %}"></script>{% endif %}
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="wty-card wty-splash">
+  <div class="wty-splash-visual">
+    <img src="{% static 'images/carpool.svg' %}" alt="" class="wty-splash-img" width="160" height="107">
+  </div>
+  <div class="wty-splash-features">
+    <span class="wty-splash-feature"><img src="{% static 'images/icon-search.svg' %}" alt="" width="20" height="20"> Search by city &amp; state</span>
+    <span class="wty-splash-feature"><img src="{% static 'images/icon-ride.svg' %}" alt="" width="20" height="20"> Share a ride</span>
+  </div>
+  <h2>Welcome to WayWithYou</h2>
+  <p class="wty-splash-text">Same destination? Share a ride! Find event registrants who might share a ride to or from your event.</p>
+  <p class="wty-splash-cta">
+    <a href="{% url 'rides:index' %}" class="wty-btn wty-btn-splash">Search for rides</a>
+    <a href="{% url 'rides:add' %}" class="wty-btn wty-btn-splash wty-btn-outline">Add a ride</a>
+  </p>
+  <p class="wty-splash-auth">
+    <a href="{% url 'login' %}">Log in</a>
+    <span class="wty-footer-sep">·</span>
+    <a href="{% url 'register' %}">Create a profile</a> to save rides you're interested in.
+  </p>
+</section>
+{% endblock %}

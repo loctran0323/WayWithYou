@@ -1,0 +1,12 @@
+{
+  "name": "waywithyou-search",
+  "version": "1.0.0",
+  "description": "WayWithYou – search registrants by city and state",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

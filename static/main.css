@@ -1,0 +1,32 @@
+/* Lab2: main.css – client-side styling (images, background, header/footer, spacing, fonts) */
+
+/* Ensure body uses a consistent background when main.css loads */
+body.main-loaded {
+  min-height: 100vh;
+}
+
+/* Extra spacing for main content area (spacing of elements) */
+.wty-main {
+  padding-top: 1.5rem;
+  padding-bottom: 2rem;
+}
+
+/* Header nav emphasis (fonts) */
+.wty-nav-link {
+  letter-spacing: 0.02em;
+}
+
+/* Footer spacing */
+.wty-footer-inner {
+  padding: 0.25rem 0;
+}
+
+/* Splash page welcome text (fonts) */
+.wty-splash h2 {
+  letter-spacing: -0.01em;
+}
+
+/* Card spacing between elements */
+.wty-card {
+  margin-bottom: 1.75rem;
+}
