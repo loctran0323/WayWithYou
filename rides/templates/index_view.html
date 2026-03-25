@@ -66,7 +66,7 @@
           {% endif %}
           <td>
             {% if person.taking_passengers %}
-            <button type="button" class="wty-btn wty-join-ride" data-origin="{{ person.origination }}{% if person.origination_state %}, {{ person.origination_state }}{% endif %}" data-destination="{{ person.destination_city }}, {{ person.destination_state }}" onclick="var o=this.getAttribute('data-origin'); var d=this.getAttribute('data-destination'); if(o && d && window.setMapRoute) window.setMapRoute(o,d); else if(d && window.setMapDestination) window.setMapDestination(d); return false;">Join ride</button>
+            <button type="button" class="wty-btn wty-join-ride" data-origin="{% if person.origination %}{{ person.origination }}{% if person.origination_state %}, {{ person.origination_state }}{% endif %}{% else %}{{ person.destination_city }}{% if person.destination_state %}, {{ person.destination_state }}{% endif %}{% endif %}" data-destination="{% if person.destination_city %}{{ person.destination_city }}{% if person.destination_state %}, {{ person.destination_state }}{% endif %}{% else %}{{ person.origination }}{% if person.origination_state %}, {{ person.origination_state }}{% endif %}{% endif %}" onclick="var o=this.getAttribute('data-origin'); var d=this.getAttribute('data-destination'); if(o && d && window.setMapRoute) { window.setMapRoute(o,d); var m=document.querySelector('.wty-map-card'); if(m) m.scrollIntoView({behavior:'smooth',block:'start'}); } else if(d && window.setMapDestination) window.setMapDestination(d); return false;">Join ride</button>
             {% else %}
             —
             {% endif %}
@@ -92,7 +92,7 @@
     <button type="button" id="map-set-destination" class="wty-btn wty-map-btn">Set destination</button>
   </div>
   <div id="map-eta" class="wty-map-eta hidden"></div>
-  <div id="wty-map" class="wty-map-container"></div>
+  <div id="wty-map" class="wty-map-container" data-directions-url="{{ directions_api_url }}"></div>
   <p class="wty-map-hint">Allow location access to see your position. Set a destination to see the route and ETA.</p>
 </section>
 
@@ -103,6 +103,6 @@
 
 {% block extra_scripts %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="{% static 'js/map.js' %}?v=5"></script>
+<script src="{% static 'js/map.js' %}?v=8"></script>
 {% if user.is_authenticated %}<script src="{% static 'js/hearts.js' %}"></script>{% endif %}
 {% endblock %}

@@ -6,6 +6,7 @@ app_name = "rides"
 urlpatterns = [
     path("", views.index, name="index"),
     path("add/", views.add_ride, name="add"),
+    path("api/directions/", views.api_directions, name="api_directions"),
     path("hearted/", views.hearted_list, name="hearted"),
     path("heart/", views.heart_toggle, name="heart_toggle"),
 ]

@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'rdd_pbq5kbs#%klh++xokz06dr-o=ki&7!9ze
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,.herokuapp.com').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,.herokuapp.com,.onrender.com,.vercel.app').split(',')
 
 
 # Application definition
@@ -135,4 +135,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/rides/'
 LOGOUT_REDIRECT_URL = '/'
+
+# Mapbox Directions API (optional). Set MAPBOX_ACCESS_TOKEN for route + ETA. Else OSRM is used.
+MAPBOX_ACCESS_TOKEN = os.environ.get('MAPBOX_ACCESS_TOKEN', '')
 

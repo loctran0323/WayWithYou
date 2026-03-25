@@ -1,7 +1,6 @@
 /**
- * Map: origin/destination pins, driving route line and ETA using free services only.
- * Nominatim (OpenStreetMap) for geocoding – US only so no wrong locations.
- * OSRM for driving route and drive time – no API key needed.
+ * Map: route line + ETA via backend (Mapbox when token set, else OSRM). Geocoding US-only.
+ * Tiles: OpenStreetMap (Leaflet).
  */
 (function () {
   var map;
@@ -11,32 +10,82 @@
   var routeLayer;
   var userLatLng = null;
 
-  /** Prefer US: "City, ST" -> "City, ST, USA" so geocoding stays in the US. */
-  function forUS(query) {
-    if (!query || typeof query !== "string") return query;
-    var t = query.trim();
-    if (/,\s*[A-Za-z]{2}\s*$/.test(t)) return t + ", USA";
-    return t;
+  function getDirectionsUrl() {
+    var el = document.getElementById("wty-map");
+    var url = (el && el.getAttribute("data-directions-url")) || "";
+    if (!url && typeof window !== "undefined" && window.location && window.location.pathname) {
+      var base = window.location.pathname.replace(/\/?$/, "");
+      if (base.indexOf("/rides") !== -1) url = (base.split("/rides")[0] || "") + "/rides/api/directions/";
+      else url = "/rides/api/directions/";
+    }
+    return url;
   }
 
-  /** Geocode one place – US only (countrycodes=us) so we never get Antarctica etc. */
-  function geocode(query) {
-    var q = forUS(query);
-    var url = "https://nominatim.openstreetmap.org/search?q=" + encodeURIComponent(q) + "&format=json&limit=1&countrycodes=us";
+  /** Call backend directions API (Mapbox or OSRM). origin/destination = address or "lat,lng". */
+  function fetchDirections(origin, destination) {
+    var base = getDirectionsUrl();
+    if (!base) return Promise.reject(new Error("Directions API not configured"));
+    var url = base + "?origin=" + encodeURIComponent(origin) + "&destination=" + encodeURIComponent(destination);
+    return fetch(url).then(function (r) {
+      if (!r.ok) {
+        return r.json().then(function (j) { throw new Error(j.error || "Request failed"); }).catch(function () { throw new Error("Request failed " + r.status); });
+      }
+      return r.json();
+    });
+  }
+
+  /** Client-side fallback: Nominatim (US) + OSRM when backend fails. No API key. */
+  function geocodeUS(q) {
+    var query = (q || "").trim();
+    if (!query) return Promise.resolve(null);
+    if (/^-?[\d.]+,-?[\d.]+$/.test(query)) {
+      var parts = query.split(",");
+      var lat = parseFloat(parts[0]), lon = parseFloat(parts[1]);
+      if (!isNaN(lat) && !isNaN(lon)) return Promise.resolve({ lat: lat, lon: lon });
+    }
+    if (/,\s*[A-Za-z]{2}\s*$/.test(query)) query = query + ", USA";
+    else if (query.indexOf(",") === -1) query = query + ", USA";
+    var url = "https://nominatim.openstreetmap.org/search?q=" + encodeURIComponent(query) + "&format=json&limit=1&countrycodes=us";
     return fetch(url, { headers: { "Accept": "application/json", "User-Agent": "WayWithYouRides/1.0" } })
       .then(function (r) { return r.json(); })
-      .then(function (results) {
-        if (!results || results.length === 0) return null;
-        var r = results[0];
-        return { lat: parseFloat(r.lat), lon: parseFloat(r.lon), display_name: r.display_name };
-      });
+      .then(function (arr) { if (!arr || !arr[0]) return null; var t = arr[0]; return { lat: parseFloat(t.lat), lon: parseFloat(t.lon) }; });
   }
-
-  /** Get driving route and duration from OSRM (no key). Coords: [lat, lng]. */
-  function osrmRoute(fromLatLng, toLatLng) {
-    var c = fromLatLng[0] + "," + fromLatLng[1] + ";" + toLatLng[0] + "," + toLatLng[1];
-    var url = "https://router.project-osrm.org/route/v1/driving/" + c + "?overview=full&geometries=geojson";
-    return fetch(url).then(function (r) { return r.json(); });
+  function osrmRoute(from, to) {
+    var c = from[0] + "," + from[1] + ";" + to[0] + "," + to[1];
+    return fetch("https://router.project-osrm.org/route/v1/driving/" + c + "?overview=full&geometries=geojson")
+      .then(function (r) { return r.json(); });
+  }
+  /** Exclude Antarctic/wrong points so we never zoom the map there. */
+  function boundsForPath(path) {
+    if (!path || !path.length) return path;
+    var ok = path.filter(function (p) { return p && p[0] >= -60 && p[0] <= 90; });
+    return ok.length ? ok : path;
+  }
+  function applyRoute(start, end, path, durationSec, etaEl, originStr, destStr) {
+    if (originMarker) map.removeLayer(originMarker);
+    originMarker = L.marker(start, { icon: L.divIcon({ className: "wty-marker-origin", html: "<div style='background:#16a34a;width:18px;height:18px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);'></div>", iconSize: [22, 22], iconAnchor: [11, 11] }) }).addTo(map).bindPopup("Start: " + (originStr || ""));
+    if (destinationMarker) map.removeLayer(destinationMarker);
+    destinationMarker = L.marker(end, { icon: L.divIcon({ className: "wty-marker-dest", html: "<div style='background:#dc2626;width:20px;height:20px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);'></div>", iconSize: [24, 24], iconAnchor: [12, 22] }) }).addTo(map).bindPopup("Destination: " + (destStr || ""));
+    if (routeLayer) map.removeLayer(routeLayer);
+    routeLayer = L.polyline(path, { color: "#1e40af", weight: 5, opacity: 0.9 }).addTo(map);
+    if (etaEl) { etaEl.classList.remove("hidden"); etaEl.textContent = (durationSec != null && durationSec > 0) ? "Drive time: ~" + (durationSec < 60 ? Math.round(durationSec / 60) + " min" : Math.floor(durationSec / 3600) + " hr " + Math.round((durationSec % 3600) / 60) + " min") : "Route shown (drive time not available)."; }
+    map.fitBounds(boundsForPath(path), { padding: [50, 50], maxZoom: 14 });
+  }
+  function tryClientSideRoute(originStr, destinationStr, etaEl) {
+    Promise.all([geocodeUS(originStr), geocodeUS(destinationStr)]).then(function (pair) {
+      var a = pair[0], b = pair[1];
+      if (!a || !b) { if (etaEl) { etaEl.textContent = "Could not find one or both places. Use city and state (e.g. Princeton, NJ)."; etaEl.classList.remove("hidden"); } return; }
+      var start = [a.lat, a.lon], end = [b.lat, b.lon];
+      osrmRoute(start, end).then(function (data) {
+        var path = [start, end], dur = null;
+        if (data && data.code === "Ok" && data.routes && data.routes[0]) {
+          var geom = data.routes[0].geometry;
+          if (geom && geom.coordinates && geom.coordinates.length) path = geom.coordinates.map(function (c) { return [c[1], c[0]]; });
+          dur = (data.routes[0].duration != null) ? data.routes[0].duration : null;
+        }
+        applyRoute(start, end, path, dur, etaEl, originStr, destinationStr);
+      }).catch(function () { applyRoute(start, end, [start, end], null, etaEl, originStr, destinationStr); });
+    }).catch(function () { if (etaEl) { etaEl.textContent = "Could not find places. Use city, state (e.g. Princeton, NJ)."; etaEl.classList.remove("hidden"); } });
   }
 
   function initMap() {
@@ -65,10 +114,18 @@
       });
     }
 
+    /** Ignore obviously wrong locations (e.g. Antarctica/Ongul Island from bad geolocation). */
+    function isReasonableLocation(lat, lng) {
+      if (lat == null || lng == null) return false;
+      if (lat < -60 || lat > 90 || lng < -180 || lng > 180) return false;
+      return true;
+    }
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         function (pos) {
-          userLatLng = [pos.coords.latitude, pos.coords.longitude];
+          var lat = pos.coords.latitude, lng = pos.coords.longitude;
+          if (!isReasonableLocation(lat, lng)) return;
+          userLatLng = [lat, lng];
           if (currentMarker) map.removeLayer(currentMarker);
           currentMarker = L.marker(userLatLng, {
             icon: L.divIcon({
@@ -90,28 +147,23 @@
     }
   }
 
-  function drawLine(latlngs, etaEl, durationSeconds) {
+  function drawRoute(data, etaEl, originStr, destStr) {
+    var start = [data.start_lat, data.start_lng];
+    var end = [data.end_lat, data.end_lng];
     if (routeLayer) map.removeLayer(routeLayer);
-    routeLayer = L.polyline(latlngs, { color: "#1e40af", weight: 5, opacity: 0.9 }).addTo(map);
+    var path = data.path && data.path.length >= 2 ? data.path : [start, end];
+    routeLayer = L.polyline(path, { color: "#1e40af", weight: 5, opacity: 0.9 }).addTo(map);
     if (etaEl) {
       etaEl.classList.remove("hidden");
-      if (durationSeconds != null && durationSeconds > 0) {
-        var min = Math.round(durationSeconds / 60);
-        etaEl.textContent = min < 60 ? "Drive time: ~" + min + " min" : "Drive time: ~" + Math.floor(min / 60) + " hr " + (min % 60) + " min";
-      } else {
-        etaEl.textContent = "Route shown (drive time not available).";
-      }
+      etaEl.textContent = data.duration_text ? "Drive time: " + data.duration_text : "Route shown (drive time not available).";
     }
-    map.fitBounds(latlngs, { padding: [50, 50], maxZoom: 14 });
+    map.fitBounds(boundsForPath(path), { padding: [50, 50], maxZoom: 14 });
   }
 
-  /**
-   * Join ride: show route from ride origin to destination (US geocoding + OSRM line + ETA).
-   */
   function setMapRoute(originStr, destinationStr) {
     if (!originStr || !destinationStr) return;
-    originStr = originStr.trim();
-    destinationStr = destinationStr.trim();
+    originStr = originStr.trim().replace(/^,|,$/g, "");
+    destinationStr = destinationStr.trim().replace(/^,|,$/g, "");
     if (!originStr || !destinationStr) return;
 
     if (!map && typeof L !== "undefined" && document.getElementById("wty-map")) initMap();
@@ -127,109 +179,110 @@
 
     removeRouteAndMarkers();
 
-    Promise.all([geocode(originStr), geocode(destinationStr)]).then(function (pair) {
-      var origin = pair[0];
-      var dest = pair[1];
-      if (!origin || !dest) {
-        if (etaEl) etaEl.textContent = "Could not find one or both places. Use city and state (e.g. Princeton, NJ).";
-        return;
-      }
-      var start = [origin.lat, origin.lon];
-      var end = [dest.lat, dest.lon];
-
-      if (originMarker) map.removeLayer(originMarker);
-      originMarker = L.marker(start, {
-        icon: L.divIcon({
-          className: "wty-marker-origin",
-          html: "<div style='background:#16a34a;width:18px;height:18px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);'></div>",
-          iconSize: [22, 22],
-          iconAnchor: [11, 11],
-        }),
-      }).addTo(map).bindPopup("Start: " + (origin.display_name || originStr));
-
-      if (destinationMarker) map.removeLayer(destinationMarker);
-      destinationMarker = L.marker(end, {
-        icon: L.divIcon({
-          className: "wty-marker-dest",
-          html: "<div style='background:#dc2626;width:20px;height:20px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);'></div>",
-          iconSize: [24, 24],
-          iconAnchor: [12, 22],
-        }),
-      }).addTo(map).bindPopup("Destination: " + (dest.display_name || destinationStr));
-
-      osrmRoute(start, end).then(function (data) {
-        if (data.code === "Ok" && data.routes && data.routes[0]) {
-          var route = data.routes[0];
-          var geom = route.geometry;
-          var durationSec = route.duration != null ? route.duration : 0;
-          if (geom && geom.coordinates && geom.coordinates.length > 0) {
-            var latlngs = geom.coordinates.map(function (c) { return [c[1], c[0]]; });
-            drawLine(latlngs, etaEl, durationSec);
-          } else {
-            drawLine([start, end], etaEl, durationSec > 0 ? durationSec : null);
-          }
-        } else {
-          drawLine([start, end], etaEl, null);
-        }
-      }).catch(function () {
-        drawLine([start, end], etaEl, null);
+    fetchDirections(originStr, destinationStr)
+      .then(function (data) {
+        var start = [data.start_lat, data.start_lng];
+        var end = [data.end_lat, data.end_lng];
+        if (originMarker) map.removeLayer(originMarker);
+        originMarker = L.marker(start, {
+          icon: L.divIcon({
+            className: "wty-marker-origin",
+            html: "<div style='background:#16a34a;width:18px;height:18px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);'></div>",
+            iconSize: [22, 22],
+            iconAnchor: [11, 11],
+          }),
+        }).addTo(map).bindPopup("Start: " + originStr);
+        if (destinationMarker) map.removeLayer(destinationMarker);
+        destinationMarker = L.marker(end, {
+          icon: L.divIcon({
+            className: "wty-marker-dest",
+            html: "<div style='background:#dc2626;width:20px;height:20px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);'></div>",
+            iconSize: [24, 24],
+            iconAnchor: [12, 22],
+          }),
+        }).addTo(map).bindPopup("Destination: " + destinationStr);
+        drawRoute(data, etaEl, originStr, destinationStr);
+      })
+      .catch(function (err) {
+        tryClientSideRoute(originStr, destinationStr, etaEl);
       });
-    }).catch(function () {
-      if (etaEl) etaEl.textContent = "Could not find places. Try city, state (e.g. Princeton, NJ).";
-    });
   }
 
-  /** Set destination (manual): route from your location to typed address. */
   function setDestination(query, etaEl) {
     if (!etaEl) etaEl = document.getElementById("map-eta");
-    etaEl.textContent = "Finding destination…";
+    etaEl.textContent = "Finding route…";
     etaEl.classList.remove("hidden");
 
-    geocode(query).then(function (dest) {
-      if (!dest) {
-        etaEl.textContent = "Destination not found. Try city, state (e.g. Princeton, NJ).";
-        removeRouteAndMarkers();
-        return;
-      }
-      var destLatLng = [dest.lat, dest.lon];
+    var origin;
+    if (userLatLng && userLatLng.length === 2) {
+      origin = userLatLng[0] + "," + userLatLng[1];
+    } else {
+      etaEl.textContent = "Allow location access to see route from your position.";
+      return;
+    }
 
-      if (originMarker) map.removeLayer(originMarker);
-      originMarker = null;
-      if (destinationMarker) map.removeLayer(destinationMarker);
-      destinationMarker = L.marker(destLatLng, {
-        icon: L.divIcon({
-          className: "wty-marker-dest",
-          html: "<div style='background:#dc2626;width:20px;height:20px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);'></div>",
-          iconSize: [24, 24],
-          iconAnchor: [12, 22],
-        }),
-      }).addTo(map).bindPopup("Destination: " + (dest.display_name || query));
+    removeRouteAndMarkers();
+    if (destinationMarker) map.removeLayer(destinationMarker);
+    destinationMarker = null;
+    if (originMarker) map.removeLayer(originMarker);
+    originMarker = null;
 
-      if (routeLayer) map.removeLayer(routeLayer);
-      routeLayer = null;
-
-      var from = userLatLng || destLatLng;
-      osrmRoute(from, destLatLng).then(function (data) {
-        if (data.code === "Ok" && data.routes && data.routes[0]) {
-          var route = data.routes[0];
-          var geom = route.geometry;
-          var durationSec = route.duration != null ? route.duration : 0;
-          if (geom && geom.coordinates && geom.coordinates.length > 0) {
-            var latlngs = geom.coordinates.map(function (c) { return [c[1], c[0]]; });
-            drawLine(latlngs, etaEl, durationSec);
-          } else {
-            drawLine([from, destLatLng], etaEl, durationSec > 0 ? durationSec : null);
-          }
-        } else {
-          drawLine([from, destLatLng], etaEl, null);
-        }
-      }).catch(function () {
-        drawLine([from, destLatLng], etaEl, null);
+    fetchDirections(origin, query)
+      .then(function (data) {
+        var start = [data.start_lat, data.start_lng];
+        var end = [data.end_lat, data.end_lng];
+        if (currentMarker) map.removeLayer(currentMarker);
+        currentMarker = L.marker(start, {
+          icon: L.divIcon({
+            className: "wty-marker-current",
+            html: "<div style='background:#2563eb;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);'></div>",
+            iconSize: [22, 22],
+            iconAnchor: [11, 11],
+          }),
+        }).addTo(map).bindPopup("Your location");
+        destinationMarker = L.marker(end, {
+          icon: L.divIcon({
+            className: "wty-marker-dest",
+            html: "<div style='background:#dc2626;width:20px;height:20px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);'></div>",
+            iconSize: [24, 24],
+            iconAnchor: [12, 22],
+          }),
+        }).addTo(map).bindPopup("Destination: " + query);
+        drawRoute(data, etaEl, origin, query);
+      })
+      .catch(function (err) {
+        if (userLatLng && userLatLng.length === 2) {
+          geocodeUS(query).then(function (dest) {
+            if (!dest) { if (etaEl) { etaEl.textContent = "Could not find destination."; etaEl.classList.remove("hidden"); } return; }
+            var start = userLatLng, end = [dest.lat, dest.lon];
+            osrmRoute(start, end).then(function (data) {
+              var path = [start, end], dur = null;
+              if (data && data.code === "Ok" && data.routes && data.routes[0]) {
+                var geom = data.routes[0].geometry;
+                if (geom && geom.coordinates && geom.coordinates.length) path = geom.coordinates.map(function (c) { return [c[1], c[0]]; });
+                dur = (data.routes[0].duration != null) ? data.routes[0].duration : null;
+              }
+              if (currentMarker) map.removeLayer(currentMarker);
+              currentMarker = L.marker(start, { icon: L.divIcon({ className: "wty-marker-current", html: "<div style='background:#2563eb;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);'></div>", iconSize: [22, 22], iconAnchor: [11, 11] }) }).addTo(map).bindPopup("Your location");
+              if (destinationMarker) map.removeLayer(destinationMarker);
+              destinationMarker = L.marker(end, { icon: L.divIcon({ className: "wty-marker-dest", html: "<div style='background:#dc2626;width:20px;height:20px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);'></div>", iconSize: [24, 24], iconAnchor: [12, 22] }) }).addTo(map).bindPopup("Destination: " + query);
+              if (routeLayer) map.removeLayer(routeLayer);
+              routeLayer = L.polyline(path, { color: "#1e40af", weight: 5, opacity: 0.9 }).addTo(map);
+              if (etaEl) { etaEl.classList.remove("hidden"); etaEl.textContent = (dur != null && dur > 0) ? "Drive time: ~" + (dur < 3600 ? Math.round(dur / 60) + " min" : Math.floor(dur / 3600) + " hr " + Math.round((dur % 3600) / 60) + " min") : "Route shown (drive time not available)."; }
+              map.fitBounds(boundsForPath(path), { padding: [50, 50], maxZoom: 14 });
+            }).catch(function () {
+              if (currentMarker) map.removeLayer(currentMarker);
+              currentMarker = L.marker(start, { icon: L.divIcon({ className: "wty-marker-current", html: "<div style='background:#2563eb;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);'></div>", iconSize: [22, 22], iconAnchor: [11, 11] }) }).addTo(map).bindPopup("Your location");
+              if (destinationMarker) map.removeLayer(destinationMarker);
+              destinationMarker = L.marker(end, { icon: L.divIcon({ className: "wty-marker-dest", html: "<div style='background:#dc2626;width:20px;height:20px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);'></div>", iconSize: [24, 24], iconAnchor: [12, 22] }) }).addTo(map).bindPopup("Destination: " + query);
+              if (routeLayer) map.removeLayer(routeLayer);
+              routeLayer = L.polyline([start, end], { color: "#1e40af", weight: 5, opacity: 0.9 }).addTo(map);
+              if (etaEl) { etaEl.classList.remove("hidden"); etaEl.textContent = "Route shown (drive time not available)."; }
+              map.fitBounds(boundsForPath([start, end]), { padding: [50, 50], maxZoom: 14 });
+            });
+          }).catch(function () { if (etaEl) { etaEl.textContent = "Could not find destination."; etaEl.classList.remove("hidden"); } });
+        } else if (etaEl) { etaEl.textContent = err.message || "Could not get route."; etaEl.classList.remove("hidden"); }
       });
-    }).catch(function () {
-      etaEl.textContent = "Could not find destination. Try city, state.";
-      removeRouteAndMarkers();
-    });
   }
 
   function removeRouteAndMarkers() {
@@ -257,11 +310,8 @@
     if (!btn) return;
     var origin = btn.dataset.origin;
     var dest = btn.dataset.destination;
-    if (origin && dest) {
-      setMapRoute(origin, dest);
-    } else if (dest) {
-      setMapDestination(dest);
-    }
+    if (origin && dest) setMapRoute(origin, dest);
+    else if (dest) setMapDestination(dest);
   });
 
   if (document.readyState === "loading") {
