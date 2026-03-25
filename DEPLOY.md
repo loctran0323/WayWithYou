@@ -28,16 +28,17 @@ Your app is ready to deploy. Use **Render** (free tier, no credit card) or **Her
      ```bash
      pip install -r requirements.txt && python manage.py collectstatic --noinput
      ```
-   - **Start command:** (must be exactly this — **not** `gunicorn app:app`)
+   - **Start command:** Use this so **migrations and sample data run without Shell** (needed on **free** tier — Shell may be unavailable):
      ```bash
-     gunicorn HandyRides.wsgi
+     python manage.py migrate --noinput && python manage.py load_initial_data && gunicorn HandyRides.wsgi
      ```
+     If you prefer to run migrate yourself (e.g. paid Shell), you can use only: `gunicorn HandyRides.wsgi`
    - **Python version (required):** Django 3.1 does **not** work on Python 3.12+ (missing `distutils`). Do **one** of:
      - Add **Environment** variable `PYTHON_VERSION` = `3.10.14`, **or**
      - Commit the repo’s **`.python-version`** file (already in this project: `3.10.14`) and redeploy.
      If logs show **Python 3.14** and `ModuleNotFoundError: No module named 'distutils'`, you are still on the wrong Python—set `PYTHON_VERSION` in the Render dashboard and **Clear build cache & deploy**.
 
-   If the deploy log shows `Running 'gunicorn app:app'` and **ModuleNotFoundError: No module named 'app'**, set **Start Command** to `gunicorn HandyRides.wsgi`, then redeploy.
+   If the deploy log shows `Running 'gunicorn app:app'` and **ModuleNotFoundError: No module named 'app'**, fix **Start Command** as above (include `gunicorn HandyRides.wsgi` at the end), then redeploy.
 
 4. **Add a PostgreSQL database**
    - Dashboard → **New → PostgreSQL**.
@@ -53,12 +54,9 @@ Your app is ready to deploy. Use **Render** (free tier, no credit card) or **Her
 
 6. **Save** – Render will build and deploy. Your site will be at `https://YOUR-SERVICE-NAME.onrender.com`.
 
-7. **Load Princeton rides (one-time)**  
-   In the Render **Shell** for your Web Service:
-   ```bash
-   python manage.py load_initial_data
-   ```
-   This loads `princeton_rides.json` so the site has all the Princeton-area rides. (If the table already has data, it skips.)
+7. **Database tables + Princeton rides (free tier)**  
+   If you used the **start command** above, each deploy runs `migrate` and `load_initial_data` automatically (`load_initial_data` does nothing once rides exist).  
+   **Without** that start command, you’d run those in Shell (paid) or from your laptop with `DATABASE_URL` set to your Render Postgres **External** URL.
 
 ---
 
