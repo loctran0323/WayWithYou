@@ -1,0 +1,17 @@
+# Optional: Render Blueprint — correct start command for this Django project.
+# Deploy: Dashboard → New → Blueprint → connect repo, or paste this file.
+# If you already created a Web Service manually, set Start Command to:
+#   gunicorn HandyRides.wsgi
+services:
+  - type: web
+    name: waywithyou
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: gunicorn HandyRides.wsgi
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.10.14"
+      - key: DEBUG
+        value: "False"
+      # Add DATABASE_URL in the dashboard (from your Postgres Internal URL).

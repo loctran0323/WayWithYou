@@ -28,10 +28,16 @@ Your app is ready to deploy. Use **Render** (free tier, no credit card) or **Her
      ```bash
      pip install -r requirements.txt && python manage.py collectstatic --noinput
      ```
-   - **Start command:**
+   - **Start command:** (must be exactly this — **not** `gunicorn app:app`)
      ```bash
      gunicorn HandyRides.wsgi
      ```
+   - **Python version (required):** Django 3.1 does **not** work on Python 3.12+ (missing `distutils`). Do **one** of:
+     - Add **Environment** variable `PYTHON_VERSION` = `3.10.14`, **or**
+     - Commit the repo’s **`.python-version`** file (already in this project: `3.10.14`) and redeploy.
+     If logs show **Python 3.14** and `ModuleNotFoundError: No module named 'distutils'`, you are still on the wrong Python—set `PYTHON_VERSION` in the Render dashboard and **Clear build cache & deploy**.
+
+   If the deploy log shows `Running 'gunicorn app:app'` and **ModuleNotFoundError: No module named 'app'**, set **Start Command** to `gunicorn HandyRides.wsgi`, then redeploy.
 
 4. **Add a PostgreSQL database**
    - Dashboard → **New → PostgreSQL**.
