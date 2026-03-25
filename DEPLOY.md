@@ -40,12 +40,15 @@ Your app is ready to deploy. Use **Render** (free tier, no credit card) or **Her
 
    If the deploy log shows `Running 'gunicorn app:app'` and **ModuleNotFoundError: No module named 'app'**, fix **Start Command** as above (include `gunicorn HandyRides.wsgi` at the end), then redeploy.
 
-4. **Add a PostgreSQL database**
-   - Dashboard → **New → PostgreSQL**.
-   - Create the DB, then go to your Web Service → **Environment**.
-   - Copy **Internal Database URL** from the new PostgreSQL service and add:
-     - Key: `DATABASE_URL`  
-     - Value: (paste the Internal Database URL)
+4. **Add a PostgreSQL database (required — without this you get `no such table: auth_user`)**
+   - Render Dashboard → **New** → **PostgreSQL** (free tier exists).
+   - Pick a name, region (same as your Web Service if possible), **Create Database**.
+   - Wait until it shows **Available**, then open that database.
+   - Find **Internal Database URL** (under *Connections* or *Info*). Copy it.
+   - Open your **Web Service** (not the DB) → **Environment** → **Add Environment Variable**:
+     - **Key:** `DATABASE_URL`
+     - **Value:** paste the **Internal Database URL** exactly.
+   - **Save Changes** — Render will redeploy. Your app will use Postgres instead of empty SQLite.
 
 5. **Optional env vars** (Web Service → Environment):
    - `DEBUG` = `False`

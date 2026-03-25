@@ -88,6 +88,14 @@ if os.environ.get('DATABASE_URL'):
     import dj_database_url
     DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
+# Render sets RENDER=true; without DATABASE_URL Django would use SQLite (empty / not persistent).
+if os.environ.get('RENDER') and not os.environ.get('DATABASE_URL'):
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured(
+        "DATABASE_URL is missing. On Render: New → PostgreSQL, then on your Web Service add "
+        "Environment variable DATABASE_URL = Internal Database URL from that database."
+    )
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
